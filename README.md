@@ -43,6 +43,7 @@ Then:
     PG::Connection.alter_method :async_exec # => only affect this method
     PG::Connection.start_intermittent_delay_and_error # => sets fake_strategy which is called to randomize settings
     MyModel.last # => may fake delay or raise error
+    PG::Connection.stop_intermittent_delay_and_error # => now it will behave consistently (sets fake_strategy to nil)
     # this is equivalent
     PG::Connection.fake_strategy = ->(m, *args) do
       PG::Connection.fake_delays = [true, false].sample
@@ -50,7 +51,8 @@ Then:
       puts "#{m}(#{args.inspect}) fake_delays=#{PG::Connection.fake_delays} fake_errors=#{PG::Connection.fake_errors}"
     end
     MyModel.last # => may still fake delay or raise error
-    PG::Connection.stop_intermittent_delay_and_error # => now it will behave consistently
+    PG::Connection.fake_strategy = nil # => now it will behave consistently, without the puts
+    PG::Connection.unalter_methods => pg behaves normally 
 
 ### License
 
